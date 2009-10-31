@@ -1,5 +1,12 @@
-Code convention: cake code convention
-Whitespace check: cake code whitespace
+cd yourapp/plugins
+git clone git://github.com/petteyg/code_check.git
+
+Code convention:
+cake code convention
+
+Whitespace check:
+cake code whitespace
+
 The check defaults to the current APP.
 You may supply any Cake constant as a path:
 cake code convention CAKE_CORE_INCLUDE_PATH
