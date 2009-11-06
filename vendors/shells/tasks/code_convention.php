@@ -18,7 +18,7 @@ class CodeConventionTask extends Shell {
 		$files = $Folder->findRecursive('.*\.php');
 		$files = array_diff($files, array(__FILE__));
 		$this->out("Checking *.php in ".$root);
-		$grep = 'grep -TRPnh "%s" %s';
+		$grep = 'grep -RPnh "%s" %s';
 		$regex = array();
 
 		$regex['array']['find'] = array('(^\s)=>(^\s)', '(^\s)=>', '=>(^\s)');
