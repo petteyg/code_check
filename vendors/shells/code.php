@@ -25,20 +25,22 @@ class CodeShell extends Shell {
 	*/
 	public function main()  {
 		if (!empty($this->args)) {
-			if (!empty($this->args[1])) {
-				$this->args[1] = constant($this->args[1]);
-			} else {
-				$this->args[1] = APP;
-			}
-			$this->{'Code'.ucfirst($this->args[0])}->execute($this->args[1]);
+			$options = array();
+			$options['path'] = !empty($this->params['path']) ? constant($this->params['path']) : APP;
+			$options['mode'] = !empty($this->params['mode']) ? $this->params['mode'] : 'interactive';
+			$options['files'] = !empty($this->params['files']) ? explode(',',$this->params['files']) : array('php');
+			$this->{'Code'.ucfirst($this->args[0])}->execute($options);
 		} else {
-			$this->out('Usage: cake code type');
+			$this->out('Usage: cake code task [options]');
 			$this->out('');
-			$this->out('type should be space-separated');
-			$this->out('list of any combination of:');
+			$this->out('Tasks:');
+			$this->out('convention : checks code for CakePHP conventions');
+			$this->out('whitespace : checks files for leading and trailing whitespace');
 			$this->out('');
-			$this->out('convention');
-			$this->out('whitespace');
+			$this->out('Options:');
+			$this->out('-path : any constant, default APP');
+			$this->out('-mode : (default)interactive diff silent');
+			$this->out('-files : comma-delimited extension list, default php');
 		}
 	}
 

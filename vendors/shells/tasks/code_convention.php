@@ -13,11 +13,15 @@ class CodeConventionTask extends Shell {
 	*
 	* @return void
 	*/
-	public function execute($root = APP)  {
-		$Folder = new Folder($root);
-		$files = $Folder->findRecursive('.*\.php');
+	public function execute($options)  {
+		$Folder = new Folder($options['path']);
+		$files = $Folder->findRecursive('.*\.('.implode('|', $options['files']).')');
 		$files = array_diff($files, array(__FILE__));
-		$this->out("Checking *.php in ".$root);
+		$this->out('Checking ', false);
+		foreach ($options['files'] as $ext) {
+			$this->out('*.'.$ext.' ', false);
+		}
+		$this->out('in '.$options['path']);
 		$grep = 'grep -RPnh "%s" %s';
 		$regex = array();
 
@@ -41,17 +45,21 @@ class CodeConventionTask extends Shell {
 							$this->out('');
 							$this->out('');
 							$this->out($this->shortPath($file));
-							preg_match('/[0-9]+/', $line, $linenumber);
-							preg_match('/(?<=:)\s+(.*)/', $line, $linecode);
-							$this->out('Line '.str_pad($linenumber[0], 4, "0", STR_PAD_LEFT).': '.$linecode[1]);
+							preg_match('/[^\d]*([\d]*)[^:]*:\s*(.*)/', $line, $linecode);
+							$linenum = $linecode[1];
+							$linecode = $linecode[2];
+							$this->out('Line '.str_pad($linenum, 4, "0", STR_PAD_LEFT).': '.$linecode);
 							$r = $regex[$t]['replace'][$i];
-							$replace = preg_replace('/'.$f.'/', $r, $linecode[1]);
+							$replace = preg_replace('/'.$f.'/', $r, $linecode);
 							$this->out('Change to: '.$replace);
-							$fix = $this->in('Fix it?', array('y', 'n'), 'y');
-							if ($fix) {
+							$fix = $this->in('Fix it?', array('y', 'n', 'q'), 'y');
+							if ($fix === 'y') {
 								$contents = preg_replace('/'.$f.'/', $r, $contents);
 								file_put_contents($file, $contents);
+							} else if ($fix === 'q') {
+								exit();
 							}
+						unset($output);
 						}
 					}
 				}

@@ -1,12 +1,15 @@
 cd yourapp/plugins
 git clone git://github.com/petteyg/code_check.git
 
-Code convention:
-cake code convention
+Usage: cake code task [options]
 
-Whitespace check:
-cake code whitespace
+Tasks:
+convention : checks code for CakePHP conventions
+whitespace : checks files for leading and trailing whitespace
 
-The check defaults to the current APP.
-You may supply any Cake constant as a path:
-cake code convention CAKE_CORE_INCLUDE_PATH
+Options:
+-path : any constant, default APP
+-mode : (default)interactive diff silent
+-files : comma-delimited extension list, default php
+
+Note: -mode options are not yet implemented.

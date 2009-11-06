@@ -13,17 +13,21 @@ class CodeWhitespaceTask extends Shell {
 	*
 	* @return void
 	*/
-	public function execute($root = APP)  {
-		$Folder = new Folder($root);
-		$files = $Folder->findRecursive('.*\.php');
-		$this->out("Checking *.php in ".$root);
+	public function execute($options)  {
+		$Folder = new Folder($options['path']);
+		$files = $Folder->findRecursive('.*\.('.implode('|', $options['files']).')');
+		$this->out("Checking ", false);
+		foreach ($options['files'] as $ext) {
+			$this->out('*.'.$ext.' ', false);
+		}
+		$this->out('in '.$options['path']);
 		foreach ($files as $file) {
 			$contents = file_get_contents($file);
 			if (preg_match('/^[\n\r|\n\r|\n|\r|\s]+\<\?php/', $contents)) {
-				$this->out('!!!contains leading whitespaces: '. $this->shortPath($file));
+				$this->out('Leading whitespace: '. $this->shortPath($file));
 			}
 			if (preg_match('/\?\>[\n\r|\n\r|\n|\r|\s]+$/', $contents)) {
-				$this->out('!!!contains trailing whitespaces: '. $this->shortPath($file));
+				$this->out('Trailing whitespace: '. $this->shortPath($file));
 			}
 		}
 	}
