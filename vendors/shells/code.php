@@ -26,7 +26,7 @@ class CodeShell extends Shell {
 	public function main()  {
 		if (!empty($this->args)) {
 			$options = array();
-			$options['path'] = !empty($this->params['path']) ? constant($this->params['path']) : APP;
+			$options['path'] = !empty($this->params['path']) ? (defined($this->params['path']) ? constant($this->params['path']) : $this->params['path']) : APP;
 			$options['mode'] = !empty($this->params['mode']) ? $this->params['mode'] : 'interactive';
 			$options['files'] = !empty($this->params['files']) ? explode(',',$this->params['files']) : array('php');
 			$this->{'Code'.ucfirst($this->args[0])}->execute($options);
@@ -38,9 +38,11 @@ class CodeShell extends Shell {
 			$this->out('whitespace : checks files for leading and trailing whitespace');
 			$this->out('');
 			$this->out('Options:');
-			$this->out('-path : any constant, default APP');
-			$this->out('-mode : (default)interactive diff silent');
-			$this->out('-files : comma-delimited extension list, default php');
+			$this->out('-path : any path constant or string, defaults to APP');
+			$this->out('-mode : interactive (default) shows errors individually and prompts for change ');
+			$this->out('        diff                  writes a unified diff to current directory, does not change any files');
+			$this->out('        silent                corrects all errors without prompting');
+			$this->out('-files : comma-delimited extension list, defaults to php');
 		}
 	}
 
