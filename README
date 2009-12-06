@@ -10,8 +10,9 @@ convention : checks code for CakePHP conventions
 whitespace : checks files for leading and trailing whitespace
 
 Options:
--path : any constant, default APP
--mode : (default)interactive diff silent
--files : comma-delimited extension list, default php
+-path    : comma-delimited path list, consisting of constants and/or strings, default APP
+-exclude : comma-delimited path list, consisting of constants and/or strings
+-mode    : (default)interactive diff silent
+-files   : comma-delimited extension list, default php
 
 Note: -mode options are not yet implemented.
