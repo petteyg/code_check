@@ -1,5 +1,7 @@
 cd yourapp/plugins
 git clone git://github.com/petteyg/code_check.git
+cake code convention -path APP,CAKE_CORE_INCLUDE_PATH -files php,ctp -exclude webroot
+
 
 Usage: cake code task [options]
 

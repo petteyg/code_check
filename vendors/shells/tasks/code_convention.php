@@ -14,36 +14,82 @@ class CodeConventionTask extends Shell {
 	* @return void
 	*/
 	public function execute($options)  {
-		$find = 'find '.$options['path'].' -name "*.'.$options['files'][0].'"';
-		for ($exts = 1; $exts < count($options['files']); $exts++) {
-			$find .= ' -o -name "*.'.$options['files'][$exts].'"';
+		$paths = array();
+		foreach	($options['path'] as $path) {
+			if (defined($path)) {
+				$paths[] = constant($path);
+			} else {
+				$paths[] = $path;
+			}
 		}
-		exec($find, $files);
+		$excludes = array();
+		if (!empty($options['exclude'])) {
+			foreach ($options['exclude'] as $exclude) {
+				if (defined($exclude)) {
+					$excludes[] = constant($exclude);
+				} else {
+					$excludes[] = $exclude;
+				}
+			}
+		}
+		$files = array();
+		foreach ($paths as $path) {
+			$find = 'find '.$path;
+			if (!empty($excludes)) {
+				$find .= ' \( -path "*'.$excludes[0].'" ';
+				for ($i = 1; $i < count($excludes); $i++) {
+					$find .= '-o -path "*'.$excludes[$i].'" ';
+				}
+				$find .= '\) -prune -not -type d -o';
+			}
+			$find .= ' -name "*.'.$options['files'][0].'"';
+			for ($i = 1; $i < count($options['files']); $i++) {
+				$find .= ' -o -name "*.'.$options['files'][$i].'"';
+			}
+			exec($find, $temp);
+			$files = array_merge($files, $temp);
+		}
+		$files = array_unique($files);
 		$files = array_diff($files, array(__FILE__));
 		$this->out('Checking ', false);
 		foreach ($options['files'] as $ext) {
 			$this->out('*.'.$ext.' ', false);
 		}
-		$this->out('in '.$options['path']);
+		$this->out('in');
+		foreach ($paths as $path) {
+			$this->out($path);
+		}
+		$this->out('');
+		if (!empty($options['exclude'])) {
+			$this->out('excluding');
+			$this->out('');
+			foreach ($options['exclude'] as $exclude) {
+				$this->out($exclude);
+			}
+		}
 		$grep = 'grep -RPnh "%s" %s';
 		$regex = array();
 
-		$regex['array']['find'] = array('(^\s)=>(^\s)', '(^\s)=>', '=>(^\s)');
-		$regex['array']['replace'] = array('$1 => $2', '$1 =>', '=> $1');
-		$regex['control']['find'] = array('if\(', 'foreach\(', 'for\(', 'while\(', 'switch\(', '\)\{');
-		$regex['control']['replace'] = array('if (', 'foreach (', 'for (', 'while (', 'switch (', ') {');
-		$regex['function']['find'] = array('(function [a-zA-Z_\x7f\xff][a-zA-Z0-9_\x7f\xff]+) \(');
-		$regex['function']['replace'] = array('$1(');
 		$regex['php']['find'] = array('(<'.'\?)\s');
 		$regex['php']['replace'] = array('$1php ');
+		$regex['function']['find'] = array('(function [a-zA-Z_\x7f\xff][a-zA-Z0-9_\x7f\xff]+) \(');
+		$regex['function']['replace'] = array('$1(');
+		$regex['control']['find'] = array('if\(', 'foreach\(', 'for\(', 'while\(', 'switch\(', '\)\{');
+		$regex['control']['replace'] = array('if (', 'foreach (', 'for (', 'while (', 'switch (', ') {');
+		$regex['array']['find'] = array('(^\s)=>(^\s)', '(^\s)=>', '=>(^\s)');
+		$regex['array']['replace'] = array('$1 => $2', '$1 =>', '=> $1');
+		$regex['deprecated']['find'] = array('([^a-zA-Z0-9_\x7f\xff])del\(', '([^a-zA-Z0-9_\x7f\xff])remove\(');
+		$regex['deprecated']['replace'] = array('$1delete(', '$1delete(');
+		$regex['wrapper']['find'] = array('(?<!function)([^a-zA-Z0-9_\x7f\xff\`])a\(', '(?<!function)([^a-zA-Z0-9_\x7f\xff])am\(', '(?<!function)([^a-zA-Z0-9_\x7f\xff])e\(([^)]*)\)', '(?<!function)([^a-zA-Z0-9_\x7f\xff])low\(', '(?<!function)([^a-zA-Z0-9_\x7f\xff])up\(', '(?<!function)([^a-zA-Z0-9_\x7f\xff])r\(');
+		$regex['wrapper']['replace'] = array('$1array(', '$1array_merge(', '$1echo $2', '$1strtolower(', '$1strtoupper(', '$1str_replace(');
 
 		$types = array_keys($regex);
 
-		if (!in_array($options['mode'], array('diff', 'interactive', 'silent'))) {
+		$modes = array('diff', 'interactive', 'silent');
+		if (!in_array($options['mode'], $modes)) {
 			$this->out('');
 			$this->out('Invalid mode "'.$options['mode'].'" specified.');
-			$modes = array('interactive', 'diff', 'silent');
-			$this->out('Perhaps you meant "'.$this->meant($options['mode'], $modes).'"?');
+			$this->out('Perhaps you meant "'.CodeShell::meant($options['mode'], $modes).'"?');
 			die();
 		}
 
@@ -80,15 +126,6 @@ class CodeConventionTask extends Shell {
 				}
 			}
 		}
-	}
-
-	public function meant($in, $params) {
-		$meant = array();
-		foreach ($params as $param) {
-			$meant[levenshtein($in, $param)] = $param;
-		}
-		ksort($meant);
-		return array_shift($meant);
 	}
 
 }
