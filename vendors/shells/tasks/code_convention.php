@@ -34,7 +34,7 @@ class CodeConventionTask extends Shell {
 		}
 		$files = array();
 		foreach ($paths as $path) {
-			$find = 'find '.$path;
+			$find = 'find "' . $path . '"';
 			if (!empty($excludes)) {
 				$find .= ' \( -path "*'.$excludes[0].'" ';
 				for ($i = 1; $i < count($excludes); $i++) {
@@ -67,7 +67,7 @@ class CodeConventionTask extends Shell {
 				$this->out($exclude);
 			}
 		}
-		$grep = 'grep -RPnh "%s" %s';
+		$grep = 'grep -RPnh "%s" "%s"';
 		$regex = array();
 
 		$regex['php']['find'] = array('(<'.'\?)\s');
