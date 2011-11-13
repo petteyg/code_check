@@ -1,4 +1,4 @@
-(1.x) git clone git://github.com/petteyg/code_check.git app/plugins/code_check
+(1.x) git clone git://github.com/petteyg/code_check.git app/plugins/code_check ; cd app/plugins/code_check ; git checkout 1.x
 (2.0) git clone git://github.com/petteyg/code_check.git app/Plugin/CodeCheck
 
 
