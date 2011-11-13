@@ -78,4 +78,3 @@ class CodeWhitespaceTask extends Shell {
 	}
 
 }
-?>

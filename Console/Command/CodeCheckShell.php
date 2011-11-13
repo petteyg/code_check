@@ -28,7 +28,7 @@ class CodeCheckShell extends Shell {
 			'convention' => 'CodeConvention',
 			'CodeConvention' => 'CodeConvention',
 			'Convention' => 'CodeConvention',
-			'whitespace' => 'whitespace',
+			'whitespace' => 'CodeWhitespace',
 			'CodeWhitespace' => 'CodeWhitespace',
 			'Whitespace' => 'CodeWhitespace',
 		);
@@ -74,4 +74,3 @@ class CodeCheckShell extends Shell {
 	}
 
 }
-?>

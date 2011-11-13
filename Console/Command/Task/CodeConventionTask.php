@@ -132,4 +132,3 @@ class CodeConventionTask extends Shell {
 	}
 
 }
-?>
