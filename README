@@ -1,9 +1,9 @@
-cd yourapp/plugins
-git clone git://github.com/petteyg/code_check.git
-cake code convention -path APP,CAKE_CORE_INCLUDE_PATH -files php,ctp -exclude webroot
+(1.x) git clone git://github.com/petteyg/code_check.git app/plugins/code_check
+(2.0) git clone git://github.com/petteyg/code_check.git app/Plugin/CodeCheck
 
 
-Usage: cake code task [options]
+(1.x) cake code convention -path APP,CAKE_CORE_INCLUDE_PATH -files php,ctp -exclude webroot
+(2.x) cake CodeCheck.CodeCheck -path APP,CAKE_CORE_INCLUDE_PATH -files php,ctp -exclude webroot
 
 Tasks:
 convention : checks code for CakePHP conventions
