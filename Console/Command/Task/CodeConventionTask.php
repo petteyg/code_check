@@ -1,4 +1,7 @@
 <?php
+
+App::uses('Shell', 'Console');
+
 class CodeConventionTask extends Shell {
 
 	/**

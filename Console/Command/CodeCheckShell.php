@@ -7,8 +7,8 @@ class CodeCheckShell extends Shell {
 	* @var array
 	*/
 	public $tasks = array(
-		'CodeConvention',
-		'CodeWhitespace'
+		'CodeCheck.CodeConvention',
+		'CodeCheck.CodeWhitespace',
 	);
 
 	/**
@@ -24,11 +24,19 @@ class CodeCheckShell extends Shell {
 	* @return void
 	*/
 	public function main()  {
+		$tasks = array(
+			'convention' => 'CodeConvention',
+			'CodeConvention' => 'CodeConvention',
+			'Convention' => 'CodeConvention',
+			'whitespace' => 'whitespace',
+			'CodeWhitespace' => 'CodeWhitespace',
+			'Whitespace' => 'CodeWhitespace',
+		);
 		if (!empty($this->args)) {
-			if (!in_array($this->args[0], $this->tasks)) {
+			if (!in_array($this->args[0], array_keys($tasks))) {
 				$this->out('');
 				$this->out('Invalid task "'.$this->args[0].'" specified.');
-				$this->out('Perhaps you meant "'.$this->meant($this->args[0], $tasks).'"?');
+				$this->out('Perhaps you meant "'.$this->meant($this->args[0], array_keys($tasks)).'"?');
 				die();
 			}
 			$options = array();
@@ -36,7 +44,7 @@ class CodeCheckShell extends Shell {
 			$options['exclude'] = !empty($this->params['exclude']) ? explode(',', $this->params['exclude']) : NULL;
 			$options['mode'] = !empty($this->params['mode']) ? $this->params['mode'] : 'interactive';
 			$options['files'] = !empty($this->params['files']) ? explode(',', $this->params['files']) : array('php');
-			$this->{'Code'.$this->args[0]}->execute($options);
+			$this->{$tasks[$this->args[0]]}->execute($options);
 		} else {
 			$this->out('Usage: cake code task [options]');
 			$this->out('');
@@ -56,8 +64,10 @@ class CodeCheckShell extends Shell {
 
 	public function meant($in, $params) {
 		$meant = array();
-		foreach ($params as $param) {
-			$meant[levenshtein($in, $param)] = $param;
+		if (!empty($params)) {
+			foreach ($params as $param) {
+				$meant[levenshtein($in, $param)] = $param;
+			}
 		}
 		ksort($meant);
 		return array_shift($meant);
