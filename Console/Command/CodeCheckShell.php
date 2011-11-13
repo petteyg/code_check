@@ -46,7 +46,7 @@ class CodeCheckShell extends Shell {
 			$options['files'] = !empty($this->params['files']) ? explode(',', $this->params['files']) : array('php');
 			$this->{$tasks[$this->args[0]]}->execute($options);
 		} else {
-			$this->out('Usage: cake code task [options]');
+			$this->out('Usage: cake CodeCheck.CodeCheck task [options]');
 			$this->out('');
 			$this->out('Tasks:');
 			$this->out('Convention : checks code for CakePHP conventions');
