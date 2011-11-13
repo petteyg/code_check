@@ -1,5 +1,5 @@
 <?php
-class CodeShell extends Shell {
+class CodeCheckShell extends Shell {
 
 	/**
 	* Shell tasks
@@ -25,8 +25,7 @@ class CodeShell extends Shell {
 	*/
 	public function main()  {
 		if (!empty($this->args)) {
-			$tasks = array('convention', 'whitespace');
-			if (!in_array($this->args[0], $tasks)) {
+			if (!in_array($this->args[0], $this->tasks)) {
 				$this->out('');
 				$this->out('Invalid task "'.$this->args[0].'" specified.');
 				$this->out('Perhaps you meant "'.$this->meant($this->args[0], $tasks).'"?');
@@ -37,13 +36,13 @@ class CodeShell extends Shell {
 			$options['exclude'] = !empty($this->params['exclude']) ? explode(',', $this->params['exclude']) : NULL;
 			$options['mode'] = !empty($this->params['mode']) ? $this->params['mode'] : 'interactive';
 			$options['files'] = !empty($this->params['files']) ? explode(',', $this->params['files']) : array('php');
-			$this->{'Code'.ucfirst($this->args[0])}->execute($options);
+			$this->{'Code'.$this->args[0]}->execute($options);
 		} else {
 			$this->out('Usage: cake code task [options]');
 			$this->out('');
 			$this->out('Tasks:');
-			$this->out('convention : checks code for CakePHP conventions');
-			$this->out('whitespace : checks files for leading and trailing whitespace');
+			$this->out('Convention : checks code for CakePHP conventions');
+			$this->out('Whitespace : checks files for leading and trailing whitespace');
 			$this->out('');
 			$this->out('Options:');
 			$this->out('-path    : comma-delimited path list (constants or strings), defaults to APP');
