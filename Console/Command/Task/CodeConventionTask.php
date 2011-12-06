@@ -85,6 +85,8 @@ class CodeConventionTask extends Shell {
 		$regex['deprecated']['replace'] = array('$1delete(', '$1delete(');
 		$regex['wrapper']['find'] = array('(?<!function)([^a-zA-Z0-9_\x7f\xff\`])a\(', '(?<!function)([^a-zA-Z0-9_\x7f\xff])am\(', '(?<!function)([^a-zA-Z0-9_\x7f\xff])e\(([^)]*)\)', '(?<!function)([^a-zA-Z0-9_\x7f\xff])low\(', '(?<!function)([^a-zA-Z0-9_\x7f\xff])up\(', '(?<!function)([^a-zA-Z0-9_\x7f\xff])r\(');
 		$regex['wrapper']['replace'] = array('$1array(', '$1array_merge(', '$1echo $2', '$1strtolower(', '$1strtoupper(', '$1str_replace(');
+		$regex['space']['find'] = array('\',\'');
+		$regex['space']['replace'] = array('\', \'');
 
 		$types = array_keys($regex);
 
