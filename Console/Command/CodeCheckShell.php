@@ -1,76 +1,36 @@
 <?php
+
+App::uses('Shell', 'Console');
+
 class CodeCheckShell extends Shell {
 
-	/**
-	* Shell tasks
-	*
-	* @var array
-	*/
 	public $tasks = array(
-		'CodeCheck.CodeConvention',
-		'CodeCheck.CodeWhitespace',
+		'CodeCheck.CodeCheck',
+		'CodeCheck.Convention',
+		'CodeCheck.Whitespace',
 	);
 
-	/**
-	* Models used by shell
-	*
-	* @var array
-	*/
-	public $uses = array();
-
-	/**
-	* Main execution function
-	*
-	* @return void
-	*/
 	public function main()  {
-		$tasks = array(
-			'convention' => 'CodeConvention',
-			'CodeConvention' => 'CodeConvention',
-			'Convention' => 'CodeConvention',
-			'whitespace' => 'CodeWhitespace',
-			'CodeWhitespace' => 'CodeWhitespace',
-			'Whitespace' => 'CodeWhitespace',
-		);
-		if (!empty($this->args)) {
-			if (!in_array($this->args[0], array_keys($tasks))) {
-				$this->out('');
-				$this->out('Invalid task "'.$this->args[0].'" specified.');
-				$this->out('Perhaps you meant "'.$this->meant($this->args[0], array_keys($tasks)).'"?');
-				die();
-			}
-			$options = array();
-			$options['path'] = !empty($this->params['path']) ? explode(',', $this->params['path']) : array('APP');
-			$options['exclude'] = !empty($this->params['exclude']) ? explode(',', $this->params['exclude']) : NULL;
-			$options['mode'] = !empty($this->params['mode']) ? $this->params['mode'] : 'interactive';
-			$options['files'] = !empty($this->params['files']) ? explode(',', $this->params['files']) : array('php');
-			$this->{$tasks[$this->args[0]]}->execute($options);
-		} else {
-			$this->out('Usage: cake CodeCheck.CodeCheck task [options]');
-			$this->out('');
-			$this->out('Tasks:');
-			$this->out('Convention : checks code for CakePHP conventions');
-			$this->out('Whitespace : checks files for leading and trailing whitespace');
-			$this->out('');
-			$this->out('Options:');
-			$this->out('-path    : comma-delimited path list (constants or strings), defaults to APP');
-			$this->out('-exclude : comma-delimited path exclusion list (constants or strings)');
-			$this->out('-mode    : interactive (default) shows errors individually and prompts for change ');
-			$this->out('           diff                  writes a unified diff to current directory, does not change any files');
-			$this->out('           silent                corrects all errors without prompting');
-			$this->out('-files   : comma-delimited extension list, defaults to php');
+		if (empty($this->args)) {
+			return $this->out($this->getOptionParser()->help());
 		}
 	}
 
-	public function meant($in, $params) {
-		$meant = array();
-		if (!empty($params)) {
-			foreach ($params as $param) {
-				$meant[levenshtein($in, $param)] = $param;
-			}
-		}
-		ksort($meant);
-		return array_shift($meant);
+	public function getOptionParser() {
+		$this->stdout->styles('option', array('bold' => true));
+		$parser = parent::getOptionParser();
+		$options = array(
+			'opt1' => array(),
+			'opt2' => array(),
+		);
+		$commands = array(
+			'convention' => array('help' => 'Tests code for CakePHP conventions'),
+			'whitespace' => array('help' => 'Checks for unneccesary and potentially harmful whitespace'),
+		);
+		$parser->addOptions($options);
+		$parser->addSubcommands($commands);
+		$parser->description('<info>Ensure code is error-free and follows conventions</info>');
+		return $parser;
 	}
 
 }
