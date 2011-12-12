@@ -4,8 +4,7 @@ App::uses('Shell', 'Console');
 
 class CodeCheckTask extends Shell {
 	
-	public function getFiles($opts = null) {
-		$opts = array();
+	public function getFiles($opts = array()) {
 		if (!isset($opts['paths'])) {
 			$opts['paths'] = explode(',', $this->params['path']);
 		}
@@ -66,6 +65,13 @@ class CodeCheckTask extends Shell {
 		$files = array_unique($files);
 		$files = array_diff($files, array(__FILE__));
 		return $files;
+	}
+
+	public function getOptions($opts = array()) {
+		if (!isset($opts['mode'])) {
+			$opts['mode'] = $this->params['mode'];
+		}
+		return $opts;
 	}
 
 	public function getOptionParser($task = false) {

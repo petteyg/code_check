@@ -7,6 +7,7 @@ class ConventionTask extends CodeCheckTask {
 
 	public function execute()  {
 		$files = parent::getFiles();
+		$options = parent::getOptions();
 		$grep = 'grep -RPnh "%s" "%s"';
 		$regex = array();
 
@@ -27,42 +28,32 @@ class ConventionTask extends CodeCheckTask {
 
 		$types = array_keys($regex);
 
-		$modes = array('diff', 'interactive', 'silent');
-		if (!in_array($options['mode'], $modes)) {
-			$this->out('');
-			$this->out('Invalid mode "'.$options['mode'].'" specified.');
-			$this->out('Perhaps you meant "'.CodeShell::meant($options['mode'], $modes).'"?');
-			die();
-		}
-
 		foreach ($files as $file) {
-			if (in_array($options['mode'], array('interactive', 'silent'))) {
-				$contents = file_get_contents($file);
-				foreach ($types as $t) {
-					for ($i = 0; $i < count($regex[$t]['find']); $i++) {
-						$f = $regex[$t]['find'][$i];
-						$grepd = exec(sprintf($grep, $f, $file), $output);
-						if (!empty($grepd)) {
-							foreach ($output as $line) {
-								$this->out('');
-								$this->out('');
-								$this->out($this->shortPath($file));
-								preg_match('/[^\d]*([\d]*)[^:]*:\s*(.*)/', $line, $linecode);
-								$linenum = $linecode[1];
-								$linecode = $linecode[2];
-								$this->out('Line '.str_pad($linenum, 4, "0", STR_PAD_LEFT).': '.$linecode);
-								$r = $regex[$t]['replace'][$i];
-								$replace = preg_replace('/'.$f.'/', $r, $linecode);
-								$this->out('Change to: '.$replace);
-								$fix = $this->in('Fix it?', array('y', 'n', 'q'), 'y');
-								if ($fix === 'y') {
-									$contents = preg_replace('/'.$f.'/', $r, $contents);
-									file_put_contents($file, $contents);
-								} else if ($fix === 'q') {
-									exit();
-								}
-							unset($output);
+			$contents = file_get_contents($file);
+			foreach ($types as $t) {
+				for ($i = 0; $i < count($regex[$t]['find']); $i++) {
+					$f = $regex[$t]['find'][$i];
+					$grepd = exec(sprintf($grep, $f, $file), $output);
+					if (!empty($grepd)) {
+						foreach ($output as $line) {
+							$this->out('');
+							$this->out('');
+							$this->out($this->shortPath($file));
+							preg_match('/[^\d]*([\d]*)[^:]*:\s*(.*)/', $line, $linecode);
+							$linenum = $linecode[1];
+							$linecode = $linecode[2];
+							$this->out('Line '.str_pad($linenum, 4, "0", STR_PAD_LEFT).': '.$linecode);
+							$r = $regex[$t]['replace'][$i];
+							$replace = preg_replace('/'.$f.'/', $r, $linecode);
+							$this->out('Change to: '.$replace);
+							$fix = $options['mode'] == 'silent' ? 'y' : $this->in('Fix it?', array('y', 'n', 'q'), 'y');
+							if ($fix === 'y') {
+								$contents = preg_replace('/'.$f.'/', $r, $contents);
+								file_put_contents($file, $contents);
+							} else if ($fix === 'q') {
+								exit();
 							}
+							unset($output);
 						}
 					}
 				}
